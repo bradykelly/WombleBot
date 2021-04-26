@@ -4,6 +4,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from discord.errors import Forbidden
 from discord.ext.commands import Bot as BotBase
 from discord import Intents
+from discord.ext.commands import when_mentioned_or
 from discord.ext.commands.context import Context
 from discord.ext.commands.errors import BadArgument, CommandNotFound, CommandOnCooldown, MissingRequiredArgument
 #from lib.db.database import Database
@@ -13,6 +14,9 @@ OWNDER_IDS = [695627499891065033]
 STD_OUT = 835859792924114954
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound,)
+
+def get_prefix(bot, message):
+    return when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
 class Ready(object):
     def __init__(self):

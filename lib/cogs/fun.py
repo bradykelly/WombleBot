@@ -9,9 +9,9 @@ class Fun(Cog):
 
     @command(name="fact")
     @cooldown(1, 60, BucketType.guild)
-    async def fact_command(self, ctx, animal: str):
-        if animal.lower() in ("dog", "cat", "panda", "fox", "bird", "koala"):
-            url = f"https://some-random-api.ml/facts/{animal.lower()}"
+    async def fact_command(self, ctx, topic: str):
+        if topic.lower() in ("dog", "cat", "panda", "fox", "bird", "koala"):
+            url = f"https://some-random-api.ml/facts/{topic.lower()}"
 
             async with request("GET", url, headers={}) as response:
                 if response.status == 200:
