@@ -1,1 +1,3 @@
 lib/bot/token
+lib/bot/dsn
+__pycache__
