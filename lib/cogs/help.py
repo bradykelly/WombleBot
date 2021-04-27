@@ -65,6 +65,8 @@ class Help(Cog):
 
     @command(name="help", brief="Show this message")
     async def help_command(self, ctx, cmd: Optional[str]):
+        """Shows the WombleBot help dialogue"""
+        
         if cmd is None:
             menu = MenuPages(source=HelpMenu(ctx, list(self.bot.commands)),
                                              delete_message_after=True,

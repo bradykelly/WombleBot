@@ -8,9 +8,11 @@ class Fun(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name="zen", aliases=["quote"],brief="Display a random Zen Quote")
+    @command(name="zen", aliases=["quote"], brief="Display a random Zen Quote")
     @cooldown(5, 30, BucketType.default)
     async def zen_command(self, ctx):
+        """Display a random Zen Quote"""
+        
         url = f"https://zenquotes.io/api/random"
 
         async with request("GET", url, headers={}) as response:

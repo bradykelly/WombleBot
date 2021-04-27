@@ -1,13 +1,15 @@
 from asyncio.tasks import sleep
 from glob import glob
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import discord
 from discord.errors import Forbidden
+from discord.ext import commands
 from discord.ext.commands import Bot as BotBase
 from discord import Intents
-from discord.ext.commands import when_mentioned_or
+from discord.ext.commands import when_mentioned_or, command, has_permissions
 from discord.ext.commands.context import Context
 from discord.ext.commands.errors import BadArgument, CommandNotFound, CommandOnCooldown, MissingRequiredArgument
-#from lib.db.database import Database
+from lib.db.database import Database
 
 DEFAULT_PREFIX = "`"
 OWNDER_IDS = [695627499891065033]
@@ -15,8 +17,6 @@ STD_OUT = 835859792924114954
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound,)
 
-def get_prefix(bot, message):
-    return when_mentioned_or(DEFAULT_PREFIX)(bot, message)
 
 class Ready(object):
     def __init__(self):
@@ -30,6 +30,7 @@ class Ready(object):
     def all_ready(self):
         return all([getattr(self, cog) for cog in COGS])
 
+
 class Bot(BotBase):
     def __init__(self):
         self.ready = False
@@ -37,14 +38,28 @@ class Bot(BotBase):
         self.guild = None
         self.scheduler = AsyncIOScheduler
 
-        # with open("./lib/bot/dsn", "r", encoding="utf-8") as df:
-        #     dsn = df.read()
-        #     self.db = Database(self, dsn)
+        with open("./lib/bot/dsn", "r", encoding="utf-8") as df:
+            dsn = df.read()
+        self.db = Database(self, dsn)
 
         super().__init__(
-            command_prefix=DEFAULT_PREFIX, 
+            command_prefix=self.command_prefix, 
+            case_insensitive=True,
+            status=discord.Status.online,
             ownder_ids=OWNDER_IDS,
             intents=Intents.all())
+
+    async def get_custom_prefix(self, guild):
+        if guild is not None:
+            prefix = await self.db.field("SELECT command_prefixes FROM config WHERE guild_id = $1", guild.id)
+            if prefix is None:
+                return DEFAULT_PREFIX
+
+            return prefix.strip()
+
+    async def command_prefix(self, bot, msg):
+        prefix = await self.get_custom_prefix(msg.guild)
+        return when_mentioned_or(prefix or DEFAULT_PREFIX)(bot, msg)
 
     def setup(self):
         for cog in COGS:

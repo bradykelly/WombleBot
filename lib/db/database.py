@@ -33,9 +33,7 @@ class Database:
     async def execute(self, sql, *values):
         async with Database.pool.acquire() as conn:
             await conn.execute(sql, *values)
-            await conn.commit()
 
     async def executemany(self, sql, valueset):
         async with Database.pool.acquire() as conn:
             await conn.executemany(sql, valueset)
-            await conn.commit()
