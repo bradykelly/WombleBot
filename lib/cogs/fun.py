@@ -7,22 +7,18 @@ class Fun(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name="fact")
-    @cooldown(1, 60, BucketType.guild)
-    async def fact_command(self, ctx, topic: str):
-        if topic.lower() in ("dog", "cat", "panda", "fox", "bird", "koala"):
-            url = f"https://some-random-api.ml/facts/{topic.lower()}"
+    @command(name="zen", aliases=["quote"],brief="Display a random Zen Quote")
+    @cooldown(5, 30, BucketType.default)
+    async def zen_command(self, ctx):
+        url = f"https://zenquotes.io/api/random"
 
-            async with request("GET", url, headers={}) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    await ctx.send(data["fact"])
+        async with request("GET", url, headers={}) as response:
+            if response.status == 200:
+                data = await response.json(content_type="text/plain")
+                await ctx.send(f"{data[0]['q']} - {data[0]['a']}")
 
-                else:
-                    await ctx.send(f"The Facts API returned a {response.status} status code.")
-
-        else:
-            await ctx.send("No facts available for that animal.")
+            else:
+                await ctx.send(f"The Zen Quotes API returned a {response.status} status code.")
 
     @Cog.listener()
     async def on_ready(self):

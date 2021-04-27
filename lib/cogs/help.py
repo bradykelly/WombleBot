@@ -63,9 +63,8 @@ class Help(Cog):
         embed.add_field(name="Command Description", value=command.help)
         await ctx.send(embed=embed)
 
-    @command(name="help")
+    @command(name="help", brief="Show this message")
     async def help_command(self, ctx, cmd: Optional[str]):
-        """Shows this message"""
         if cmd is None:
             menu = MenuPages(source=HelpMenu(ctx, list(self.bot.commands)),
                                              delete_message_after=True,
