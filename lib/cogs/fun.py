@@ -1,4 +1,5 @@
 from aiohttp import request
+from discord.embeds import Embed
 from discord.ext.commands import command, cooldown
 from discord.ext.commands import Cog, BucketType
 
@@ -15,7 +16,12 @@ class Fun(Cog):
         async with request("GET", url, headers={}) as response:
             if response.status == 200:
                 data = await response.json(content_type="text/plain")
-                await ctx.send(f"{data[0]['q']} - {data[0]['a']}")
+
+                embed=Embed(title=f"{data[0]['q']} - {data[0]['a']}", colour=ctx.author.colour)
+                embed.set_thumbnail(url=ctx.guild.me.avatar_url)
+                embed.set_author(name="Zen Quotes")
+                embed.set_footer(text="Inspirational quotes provided by ZenQuotes API (https://zenquotes.io/)")
+                await ctx.send(embed=embed)
 
             else:
                 await ctx.send(f"The Zen Quotes API returned a {response.status} status code.")
