@@ -68,14 +68,16 @@ class Help(Cog):
         """Shows the WombleBot help dialogue"""
         
         if cmd is None:
-            menu = MenuPages(source=HelpMenu(ctx, list(self.bot.commands)),
+            commands = [cmd for cmd in list(self.bot.commands) if not cmd.hidden]
+            menu = MenuPages(source=HelpMenu(ctx, commands),
                                              delete_message_after=True,
                                              timeout=60.0)
             await menu.start(ctx)
 
         else:
-            if (command := get(self.bot.commands, name=cmd)):   
-                await self.show_help(ctx, command)
+            if (command := get(self.bot.commands, name=cmd)): 
+                if not command.hidden:  
+                    await self.show_help(ctx, command)
 
             else:
                 await ctx.send("That command does not exist.")

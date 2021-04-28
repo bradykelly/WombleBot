@@ -13,7 +13,7 @@ from lib.db.database import Database
 
 DEFAULT_PREFIX = "`"
 OWNDER_IDS = [695627499891065033]
-STD_OUT = 835859792924114954
+DEFAULT_STD_OUT = 835859792924114954
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound,)
 
@@ -125,7 +125,7 @@ class Bot(BotBase):
 
     async def on_ready(self):
         if not self.ready:
-            self.stdout = self.get_channel(STD_OUT)
+            self.stdout = self.get_channel(DEFAULT_STD_OUT)
 
             while not self.cogs_ready.all_ready():
                 await sleep(0.5)

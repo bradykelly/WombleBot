@@ -1,6 +1,7 @@
+from time import sleep
 from discord.ext.commands import Cog
 from discord.ext.commands import CheckFailure
-from discord.ext.commands import command, has_permissions
+from discord.ext.commands import command, has_permissions, is_owner
 from lib.db.database import Database
 
 
@@ -27,6 +28,13 @@ class Misc(Cog):
     async def prefix_command_error(self, ctx, exc)   :
         if isinstance(exc, CheckFailure):
             await ctx.send("You need the Manage Server permission to do that.")
+
+    @command(name="shutdown", hidden=True)
+    @is_owner()
+    async def shutdown_command(self, ctx):
+        await ctx.send("Bot is shutting down...")
+        sleep(30)
+        await ctx.bot.logout()
 
     @Cog.listener()
     async def on_ready(self):
