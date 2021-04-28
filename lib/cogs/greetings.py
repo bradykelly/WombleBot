@@ -1,5 +1,6 @@
 from discord.errors import Forbidden
 from discord.ext.commands import Cog
+from discord.ext.commands.core import guild_only
 
 
 DEFAULT_WELCOME = 836528471328161812
@@ -33,10 +34,17 @@ class Greetings(Cog):
 
         start_role_list = await self.bot.db.field("SELECT start_role_list FROM config WHERE guild_id = $1", member.guild.id)
         if start_role_list is not None:
-            roles_list = start_role_list.split("!")
-            await member.add_roles(*[int(role) for role in roles_list])
-                
+            roles_list = start_role_list.split(";")
+            try:
+                an_int = int(roles_list[0])   
 
+            except ValueError:
+                pass     
+                   
+            else:
+                to_add = [member.guild.get_role(int(role)) for role in roles_list]
+                await member.add_roles(*to_add)
+                
     @Cog.listener()
     async def on_member_leave(self, member):
         pass
