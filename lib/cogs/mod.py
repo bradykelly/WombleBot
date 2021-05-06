@@ -47,9 +47,37 @@ class Mod(Cog):
             ctx.send("Insufficient permissions to perform this action.")
 
     @command(name="ban", brief="Ban members")
+    @bot_has_permissions(ban_members=True)
+    @has_permissions(ban_members=True)
     async def ban_command(self, ctx, targets: Greedy[Member], *, reason: Optional[str] = "No reason provided"):
         """Ban one or more members from this server"""
-        pass
+        if not len(targets):
+            await ctx.send("One or more required arguments are missing.")
+        
+        else:
+            for target in targets:
+                await target.ban(reason=reason)
+
+                embed = Embed(title="Member banned",
+							  colour=0xDD2222,
+							  timestamp=datetime.utcnow())
+                embed.set_thumbnail(url=target.avatar_url)
+
+                fields = [("Member", f"{target.name} a.k.a. {target.display_name}", False),
+						  ("Actioned by", ctx.author.display_name, False),
+						  ("Reason", reason, False)]
+                for name, value, inline in fields:
+                    embed.add_field(name=name, value=value, inline=inline)
+
+                log_channel = await self.bot.db.field("SELECT log_chan_id FROM config WHERE guild_id = $1", ctx.guild.id)
+                log_channel = log_channel or DEFAULT_LOG      
+
+                await self.bot.get_channel(log_channel).send(embed=embed)               
+
+    @ban_command.error
+    async def ban_members_error(self, ctx, exc):
+        if isinstance(exc, CheckFailure):
+            ctx.send("Insufficient permissions to perform this action.")
 
     @Cog.listener()
     async def on_ready(self):
